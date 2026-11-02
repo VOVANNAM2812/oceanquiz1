@@ -134,7 +134,7 @@ Mọi đối chiếu đều đạt. Dữ liệu lượt làm chỉ ở database 
 - Lần tiếp theo (log local 9) model `gemini-3.8-flash` chạm HTTP timeout 90 giây. Web trả thông báo lỗi có kiểm soát và cập nhật log failed, không còn PHP fatal hoặc log pending treo.
 - Giữ nguyên API key, đổi model local sang `gemini-3.5-flash-lite`, tải lại form và xác nhận trang ghi “Đã cấu hình key” cùng đúng tên model.
 - Bấm tạo từ form với tên “Minecraft — Tạo trực tiếp từ giao diện”: thành công trong 30 giây, log local 10 success, tự chuyển tới `/admin/question-sets/8/edit` với thông báo “Gemini đã tạo 5 câu nháp”.
-- Đối chiếu database: source ai, status draft, 5 câu, 20 lựa chọn, mỗi câu có một đáp án đúng và giải thích; `isReady()` true. Không xuất bản bộ thử này.
+- Đối chiếu database lúc sinh: source ai, status draft, 5 câu, 20 lựa chọn, mỗi câu có một đáp án đúng và giải thích; `isReady()` true. Sau đó bộ được rà soát và xuất bản theo yêu cầu riêng; xem [biên bản kiểm tra Minecraft](kiem-tra-minecraft.md).
 - Đã lưu ảnh xác nhận giao diện trong `storage/app/qa/gemini-web-success.jpg` (artifact local, không chứa key).
 - Đặt Flash-Lite làm model mặc định trong cấu hình mẫu để phù hợp bản quiz cơ bản. Hiển thị model đang dùng trên form admin. Không đưa `.env` hoặc key lên Git.
 - Bổ sung mã HTTP, trạng thái Google và chi tiết lỗi được che key thay cho thông báo từ chối chung. Kiểm thử 400/403/404/503 xác nhận đúng loại lỗi và không lộ key.
