@@ -24,3 +24,4 @@ require __DIR__.'/auth.php';
 require __DIR__.'/admin-articles.php';
 require __DIR__.'/quiz.php';
 require __DIR__.'/admin-question-sets.php';
+require __DIR__.'/leaderboard.php';
