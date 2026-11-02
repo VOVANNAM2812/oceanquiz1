@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         if (! app()->environment('local', 'testing')) {
             return;
         }
-        foreach ([['admin@oceanquiz.local', 'Quản trị viên', 'admin'], ['user@oceanquiz.local', 'Nhà thám hiểm', 'user']] as [$email, $name, $role]) {
+        foreach ([['admin@oceanquiz.local', 'Quản trị viên', 'admin'], ['user@oceanquiz.local', 'Nhà thám hiểm', 'user'], ['user2@oceanquiz.local', 'Nhà thám hiểm 2', 'user']] as [$email, $name, $role]) {
             if (! User::where('email', $email)->exists()) {
                 $user = new User(['name' => $name, 'email' => $email, 'password' => Hash::make('OceanQuiz@123')]);
                 $user->role = $role;

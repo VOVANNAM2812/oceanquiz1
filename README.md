@@ -57,6 +57,7 @@ Seeder tài khoản chỉ chạy ở môi trường `local` hoặc `testing`.
 |---|---|---|
 | Admin | `admin@oceanquiz.local` | `OceanQuiz@123` |
 | User | `user@oceanquiz.local` | `OceanQuiz@123` |
+| User 2 | `user2@oceanquiz.local` | `OceanQuiz@123` |
 
 Có 3 bài và 3 bộ đã xuất bản về cá voi xanh, rùa biển, san hô; mỗi bộ 5 câu. Có thêm 1 bộ nháp dùng để kiểm tra quyền truy cập. Seed lại không ghi đè bài/bộ đã tồn tại hoặc kết quả. Dữ liệu từ thao tác demo trên từng máy không được đưa lên GitHub; máy mới tái tạo dữ liệu bằng seeder.
 
