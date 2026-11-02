@@ -85,4 +85,19 @@ class QuizTest extends TestCase
         $this->get(route('attempts.result', $attempt))->assertOk();
         $this->post(route('attempts.start', $attempt->questionSet))->assertNotFound();
     }
+
+    public function test_mixed_answers_and_invalid_multi_selection(): void
+    {
+        $attempt = $this->startQuiz(); $questions = $attempt->questionSet->questions;
+        $this->post(route('attempts.submit', $attempt), ['answers' => [$questions[0]->id => [$questions[0]->options[0]->id, $questions[0]->options[1]->id]]])->assertSessionHasErrors();
+        $this->assertSame(0, $attempt->answers()->count());
+        $this->post(route('attempts.submit', $attempt), ['answers' => [
+            $questions[0]->id => $questions[0]->options[0]->id,
+            $questions[1]->id => $questions[1]->options[0]->id,
+            $questions[2]->id => $questions[2]->options[1]->id,
+        ]])->assertSessionHasNoErrors();
+        $this->assertSame(20, $attempt->fresh()->total_score);
+        $this->assertSame(2, $attempt->fresh()->correct_count);
+        $this->assertSame(2, $attempt->answers()->whereNull('option_id')->count());
+    }
 }
