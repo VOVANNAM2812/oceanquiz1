@@ -66,4 +66,27 @@ class GeminiTest extends TestCase
         $this->assertSame(2, AiGenerationLog::where('status', 'failed')->count());
         $this->assertFalse(AiGenerationLog::where('error_message', 'like', '%fake-test-key%')->exists());
     }
+
+    public function test_invalid_json_and_truncated_response_are_rejected(): void
+    {
+        $article = Article::create(['title' => 'Biển', 'content' => 'Nội dung']);
+        Http::fake(['*' => Http::response(['candidates' => [['finishReason' => 'STOP', 'content' => ['parts' => [['text' => '{broken']]]]]])]);
+        $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'JSON lỗi'])->assertSessionHasErrors();
+        Http::fake(['*' => Http::response(['candidates' => [['finishReason' => 'MAX_TOKENS', 'content' => ['parts' => [['text' => json_encode($this->data())]]]]]])]);
+        $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'Bị cắt'])->assertSessionHasErrors();
+        $this->assertSame(0, QuestionSet::count());
+        $this->assertSame(2, AiGenerationLog::where('status', 'failed')->count());
+    }
+
+    public function test_content_changed_while_waiting_for_ai_cannot_be_saved_as_a_mismatched_quiz(): void
+    {
+        $article = Article::create(['title' => 'Biển', 'content' => 'Nội dung cũ']);
+        Http::fake(function () use ($article) {
+            $article->update(['content' => 'Nội dung mới trong lúc chờ API']);
+            return Http::response(['candidates' => [['finishReason' => 'STOP', 'content' => ['parts' => [['text' => json_encode($this->data())]]]]]]);
+        });
+        $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'Không khớp'])->assertSessionHasErrors();
+        $this->assertSame(0, QuestionSet::count());
+        $this->assertDatabaseHas('ai_generation_logs', ['status' => 'failed']);
+    }
 }

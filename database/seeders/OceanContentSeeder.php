@@ -15,7 +15,7 @@ class OceanContentSeeder extends Seeder
                 'title' => 'Cá voi xanh: người khổng lồ của biển',
                 'description' => 'Gặp một loài thú biển khổng lồ với cách kiếm ăn thật đặc biệt.',
                 'url' => 'https://www.fisheries.noaa.gov/species/blue-whale',
-                'content' => "Cá voi xanh là động vật có vú sống ở biển. Chúng cần lên mặt nước để hít thở không khí.\n\nThức ăn chủ yếu của cá voi xanh là nhuyễn thể krill. Khi kiếm ăn, cá voi ngậm một lượng nước lớn rồi đẩy nước ra, giữ con mồi lại bằng các tấm sừng hàm.\n\nVa chạm với tàu và mắc vào ngư cụ là những mối đe dọa đối với cá voi xanh.",
+                'content' => "Cá voi xanh là động vật có vú sống ở biển. Chúng cần lên mặt nước để hít thở không khí.\n\nThức ăn chủ yếu của cá voi xanh là các giáp xác nhỏ thuộc nhóm krill. Khi kiếm ăn, cá voi ngậm một lượng nước lớn rồi đẩy nước ra, giữ con mồi lại bằng các tấm sừng hàm.\n\nVa chạm với tàu và mắc vào ngư cụ là những mối đe dọa đối với cá voi xanh.",
                 'questions' => [
                     ['Cá voi xanh thuộc nhóm nào?', ['Cá', 'Động vật có vú', 'Chim', 'Côn trùng'], 1, 'Cá voi xanh là động vật có vú.'],
                     ['Cá voi xanh cần lên mặt nước để làm gì?', ['Đẻ trứng', 'Uống nước ngọt', 'Hít thở không khí', 'Mọc vây'], 2, 'Cá voi cần hít thở không khí.'],
