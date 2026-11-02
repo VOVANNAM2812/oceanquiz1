@@ -1,0 +1,6 @@
+@extends('layouts.ocean')
+@section('title', 'Quản lý bài kiến thức')
+@section('content')
+<div class="page-heading"><div><span class="eyebrow">BIÊN SOẠN NỘI DUNG</span><h1>Bài kiến thức</h1><p>Nền tảng cho mỗi chuyến khám phá.</p></div><div class="header-actions"><a class="btn" href="{{ route('admin.articles.create') }}">+ Thêm bài viết</a>@if(Route::has('admin.wikipedia.index'))<a class="btn btn-outline" href="{{ route('admin.wikipedia.index') }}">Lấy từ Wikipedia ↗</a>@endif</div></div>
+<div class="panel table-scroll"><table><thead><tr><th>Bài viết</th><th>Nguồn</th><th>Số bộ</th><th>Thao tác</th></tr></thead><tbody>@forelse($articles as $article)<tr><td><strong>{{ $article->title }}</strong></td><td>{{ $article->source_name ?: 'Nhập thủ công' }}</td><td>{{ $article->question_sets_count }}</td><td><div class="actions"><a class="btn btn-small btn-outline" href="{{ route('admin.articles.edit', $article) }}">Xem / sửa</a>@if(!$article->question_sets_count)<form method="post" action="{{ route('admin.articles.destroy', $article) }}" data-confirm="Xóa bài viết chưa sử dụng này?">@csrf @method('delete')<button class="btn btn-small btn-danger">Xóa</button></form>@endif</div></td></tr>@empty<tr><td colspan="4" class="muted">Chưa có bài viết. Thêm bài đầu tiên để bắt đầu.</td></tr>@endforelse</tbody></table></div>{{ $articles->links() }}
+@endsection
