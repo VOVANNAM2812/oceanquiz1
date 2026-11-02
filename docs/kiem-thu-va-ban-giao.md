@@ -87,10 +87,42 @@ Thí nghiệm kiểm tra khóa và transaction ở lớp controller/database; kh
 - Các lần đầu đã gặp hết thời gian chờ; ứng dụng ghi log failed và không lưu câu hỏi một phần.
 - Điều chỉnh tác vụ quiz dùng thinkingLevel low cho Gemini 3 và timeout 90 giây; Gemini 2.5 không bị gửi tham số thinkingLevel không tương thích. Tham khảo [hướng dẫn thinking của Google](https://ai.google.dev/gemini-api/docs/generate-content/thinking.md).
 - Sau khi người dùng cập nhật key, gọi `gemini-3.8-flash` thành công trong 55,11 giây: HTTP 200, finishReason STOP, nhật ký local ID 4 ở trạng thái success.
-- Bộ local ID 6: “Gemini kiểm tra key mới — Cá voi xanh”, source ai, status draft, 5 câu, 20 lựa chọn, mỗi câu đúng 1 đáp án và có giải thích. `isReady()` trả true. Chưa xuất bản.
+- Bộ local ID 6: “Gemini kiểm tra key mới — Cá voi xanh”, source ai, khi sinh có status draft, 5 câu, 20 lựa chọn, mỗi câu đúng 1 đáp án và có giải thích. `isReady()` trả true. Bộ được rà soát và xuất bản ở đợt kiểm tra tiếp theo bên dưới.
 - Trước đó, `gemini-3.5-flash-lite` cũng đã tạo thành công bộ local ID 5 trong 25,82 giây; giữ nguyên bộ này để đối chiếu.
 - ID và bộ thử chỉ tồn tại trong database local, không phải dữ liệu mặc định khi clone repo. Không lưu key hoặc dấu nhận dạng key trong báo cáo.
 - Kiểm thử sau điều chỉnh: 51 tests passed, 209 assertions trên MariaDB. Có thêm kiểm thử cấu hình theo họ model và lỗi kết nối không làm lộ key.
+
+### Xuất bản và kiểm tra hai người dùng ngày 03/11/2026
+
+- Đã đọc lại cả 5 câu, bốn lựa chọn/câu và giải thích, đối chiếu trực tiếp bài cá voi xanh đã lưu. Các đáp án đều được bài nguồn hỗ trợ; không cần sửa nội dung.
+- Đăng nhập admin qua HTTP, dùng CSRF/session thật để xuất bản bộ ID 6. Trạng thái sau thao tác là published.
+- Đăng ký mới qua HTTP tài khoản `user2@oceanquiz.local`, tên “Nhà thám hiểm 2”, role user. Mật khẩu demo `OceanQuiz@123`; thêm tài khoản này vào UserSeeder để máy clone mới cũng có hai user thử xếp hạng. Seeder không ghi đè tài khoản đang có.
+- Dùng các phiên HTTP độc lập của user và user2: đọc bài, bắt đầu, lấy trang quiz, nộp đáp án, mở trang kết quả và bảng xếp hạng. Không ghi trực tiếp điểm hoặc thời gian vào database.
+
+| Lượt local | Tài khoản | Đáp án thử | Điểm server | Hoàn thành, giờ Việt Nam |
+|---|---|---|---|---|
+| 4 | user@oceanquiz.local | 4 đúng, 1 sai | 40 | 03/11/2026 00:19:29.075266 |
+| 5 | user2@oceanquiz.local | 3 đúng, 1 sai, 1 bỏ trống | 30 | 03/11/2026 00:19:29.958224 |
+| 6 | user2@oceanquiz.local | 5 đúng | 50 | 03/11/2026 00:19:30.960523 |
+| 7 | user@oceanquiz.local | 5 đúng | 50 | 03/11/2026 00:19:33.246991 |
+| 8 | user2@oceanquiz.local | 3 đúng, 1 sai, 1 bỏ trống | 30 | 03/11/2026 00:19:34.275217 |
+
+Kết quả bảng xếp hạng từ HTML trả về qua HTTP:
+
+1. Sau hai lượt đầu: user 40 đứng trước user2 30.
+2. Sau lượt 6: user2 50 đứng trước user 40.
+3. Sau lượt 7: hai người cùng 50, user2 đứng hạng 1 vì đạt 50 lúc 00:19:30, user hạng 2 vì đạt 50 lúc 00:19:33. Lượt 40 trước đó của user không được dùng làm thời điểm đạt 50.
+4. Sau lượt 8: user2 vẫn giữ 50 và thời điểm 00:19:30, không nhân đôi dòng và không lấy điểm 30 mới hơn.
+5. Gửi lại lượt 7 với đáp án trống: vẫn 50 điểm, finished_at giữ nguyên, chỉ có 5 câu trả lời.
+
+Mọi đối chiếu đều đạt. Dữ liệu lượt làm chỉ ở database local, không đưa lên GitHub hoặc áp dụng vào máy khác qua seeder. Báo cáo chi tiết local nằm trong `storage/app/qa/published-ranking-result.json` và bị Git bỏ qua.
+
+### Sửa trường hợp CLI có key nhưng web báo chưa cấu hình
+
+- Server local trước đó được khởi động với `--no-reload`, nên giữ giá trị môi trường cũ khi người dùng thay `.env`. CLI mới nhận key nhưng web cũ vẫn báo trống dù không có config cache.
+- Đã dừng đúng tiến trình server của dự án, xóa config cache và chạy lại `php artisan serve --host=127.0.0.1 --port=8001` không có `--no-reload`.
+- Kiểm tra qua phiên HTTP đăng nhập admin xác nhận trang `/admin/ai` nhận cấu hình key, không còn cảnh báo trống. Không hiển thị hoặc ghi lại giá trị key.
+- Bổ sung hướng dẫn khởi động lại ngay trong cảnh báo giao diện và README để tránh nhầm lỗi cấu hình với lỗi API.
 
 ## Cách chạy lại kiểm thử
 
