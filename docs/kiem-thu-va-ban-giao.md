@@ -127,6 +127,20 @@ Mọi đối chiếu đều đạt. Dữ liệu lượt làm chỉ ở database 
 
 ## Cách chạy lại kiểm thử
 
+### Kiểm tra tạo trực tiếp trên giao diện ngày 03/11/2026
+
+- Mở trang `/admin/ai` trên trình duyệt, chọn đúng bài Minecraft người dùng đang gặp lỗi, nhập tên bộ và bấm nút “Sinh 5 câu nháp bằng Gemini”. Không dùng CLI/controller giả lập để thực hiện các lần tạo trong đợt này.
+- Lần đầu (log local 8) vẫn bị PHP giới hạn 60 giây. Đã đặt lại giới hạn cho mọi yêu cầu web của thao tác sinh, khởi động lại tiến trình và đo được PHP SAPI `cli-server`, execution limit 120 giây. Không áp giới hạn này vào CLI.
+- Lần tiếp theo (log local 9) model `gemini-3.8-flash` chạm HTTP timeout 90 giây. Web trả thông báo lỗi có kiểm soát và cập nhật log failed, không còn PHP fatal hoặc log pending treo.
+- Giữ nguyên API key, đổi model local sang `gemini-3.5-flash-lite`, tải lại form và xác nhận trang ghi “Đã cấu hình key” cùng đúng tên model.
+- Bấm tạo từ form với tên “Minecraft — Tạo trực tiếp từ giao diện”: thành công trong 30 giây, log local 10 success, tự chuyển tới `/admin/question-sets/8/edit` với thông báo “Gemini đã tạo 5 câu nháp”.
+- Đối chiếu database: source ai, status draft, 5 câu, 20 lựa chọn, mỗi câu có một đáp án đúng và giải thích; `isReady()` true. Không xuất bản bộ thử này.
+- Đã lưu ảnh xác nhận giao diện trong `storage/app/qa/gemini-web-success.jpg` (artifact local, không chứa key).
+- Đặt Flash-Lite làm model mặc định trong cấu hình mẫu để phù hợp bản quiz cơ bản. Hiển thị model đang dùng trên form admin. Không đưa `.env` hoặc key lên Git.
+- Bổ sung mã HTTP, trạng thái Google và chi tiết lỗi được che key thay cho thông báo từ chối chung. Kiểm thử 400/403/404/503 xác nhận đúng loại lỗi và không lộ key.
+- Kết quả kiểm thử mới: 52 tests passed, 227 assertions. Kết quả thành công của Flash-Lite không chứng minh model 3.8 hết lỗi chờ; các lỗi nhà cung cấp vẫn được xử lý và ghi nhật ký.
+
+
 Tạo riêng database `oceanquiz1_test`, kiểm tra cấu hình test trước khi chạy:
 
 ```powershell

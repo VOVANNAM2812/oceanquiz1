@@ -42,9 +42,22 @@ class GeminiService
                     'generationConfig' => $generationConfig,
                 ]);
             if (! $response->successful()) {
-                throw new RuntimeException($response->status() === 429
-                    ? 'Gemini đang giới hạn lượt gọi hoặc hết hạn mức. Hãy thử lại sau.'
-                    : 'Gemini từ chối yêu cầu. Hãy kiểm tra khóa, model và quyền truy cập.');
+                $status = $response->status();
+                $code = (string) $response->json('error.status', 'UNKNOWN');
+                if (! preg_match('/^[A-Z_]+$/', $code)) $code = 'UNKNOWN';
+                $detail = (string) $response->json('error.message', '');
+                $detail = str_replace([$key, rawurlencode($key)], '[REDACTED]', $detail);
+                $detail = preg_replace('/AIza[0-9A-Za-z_-]+/', '[REDACTED]', $detail);
+                $message = match ($status) {
+                    400 => 'Gemini báo dữ liệu yêu cầu không hợp lệ.',
+                    401, 403 => 'Gemini không chấp nhận khóa hoặc tài khoản chưa có quyền truy cập.',
+                    404 => 'Không tìm thấy model Gemini đã cấu hình.',
+                    429 => 'Gemini đang giới hạn lượt gọi hoặc hết hạn mức. Hãy thử lại sau.',
+                    500, 502, 503, 504 => 'Dịch vụ Gemini đang bận hoặc gặp lỗi. Hãy thử lại sau.',
+                    default => 'Gemini chưa xử lý được yêu cầu.',
+                };
+                throw new RuntimeException('Gemini [HTTP '.$status.' / '.$code.']: '.$message
+                    .($detail !== '' ? ' Chi tiết: '.mb_substr($detail, 0, 600) : ''));
             }
             if ($response->json('candidates.0.finishReason') !== 'STOP') {
                 throw new RuntimeException('Gemini chưa trả lời đầy đủ hoặc đã chặn nội dung. Không lưu câu hỏi nào.');

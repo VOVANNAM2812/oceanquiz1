@@ -33,7 +33,7 @@ Tạo database riêng `oceanquiz1_test` với cùng tài khoản DB trong `.env`
 
 ```dotenv
 GEMINI_API_KEY=your-own-key
-GEMINI_MODEL=gemini-3.8-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 WIKI_USER_AGENT="OceanQuiz/1.0 (https://github.com/VOVANNAM2812/oceanquiz1)"
 ```
 
@@ -45,6 +45,8 @@ Nếu đã dán key nhưng web vẫn báo chưa cấu hình trong khi CLI nhận
 - Gemini: vào **Gemini & nhật ký**, chọn bài và tên bộ → sinh đúng 5 câu nháp. Chỉ dùng tối đa 12.000 ký tự đầu bài. Server kiểm tra toàn bộ JSON trước khi lưu trong transaction; một câu sai thì không lưu bộ/câu nào.
 - Nhật ký ghi thời gian, model, người thao tác, trạng thái, lỗi và phản hồi văn bản đã giới hạn độ dài. Chỉ admin xem được; không ghi API key.
 - Khi API lỗi hoặc không có khóa, vẫn có thể nhập bài và tạo câu thủ công. Không tự xuất bản nội dung AI.
+- Mặc định dùng `gemini-3.5-flash-lite` cho tác vụ quiz. Đã bấm trực tiếp trên web với bài Minecraft và tạo đủ 5 câu trong khoảng 30 giây. `gemini-3.8-flash` vẫn có thể cấu hình, nhưng đã gặp timeout 90 giây trong đợt thử này.
+- Lỗi API hiển thị mã HTTP và mã trạng thái của Google để phân biệt sai dữ liệu, thiếu quyền, model không tồn tại, hạn mức và dịch vụ tạm bận. Chi tiết được giới hạn độ dài và che key trước khi hiển thị hoặc ghi nhật ký.
 - Với Gemini 3, quiz sử dụng mức suy luận `low`; thời gian chờ tối đa 90 giây. Cấu hình này giúp tránh chờ quá lâu cho tác vụ 5 câu, nhưng tốc độ thực tế vẫn phụ thuộc API.
 - Thao tác sinh câu hỏi nâng giới hạn thực thi PHP tối thiểu lên 120 giây khi cần, để yêu cầu API 90 giây còn đủ thời gian ghi kết quả hoặc nhật ký lỗi. Trên server phát triển PHP một tiến trình, yêu cầu trang khác có thể phải chờ trong lúc Gemini đang chạy.
 
@@ -121,7 +123,7 @@ Chi tiết nghiệm thu, giới hạn kiểm chứng và kịch bản demo nằm
 
 ## Kết quả kiểm tra bản bàn giao
 
-- `php artisan test --compact`: **51 tests passed, 209 assertions** trên MariaDB.
+- `php artisan test --compact`: **52 tests passed, 227 assertions** trên MariaDB.
 - `npm run build`, `php artisan view:cache` và `composer validate --strict`: thành công.
 - Đã kiểm tra trình duyệt luồng user (50/50, lịch sử, xếp hạng), admin, Wikipedia thật và responsive 1280/375 px.
 - Đã thử start/submit đồng thời bằng hai tiến trình trên database riêng: 1 lượt, 5 câu trả lời, 50 điểm.

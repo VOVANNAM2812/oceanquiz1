@@ -18,6 +18,7 @@ class AiGenerationController extends Controller
             'articles' => Article::orderBy('title')->get(['id', 'title']),
             'logs' => AiGenerationLog::with(['article', 'user'])->latest('id')->paginate(15),
             'configured' => (bool) config('services.gemini.key'),
+            'model' => config('services.gemini.model'),
         ]);
     }
 
@@ -28,9 +29,8 @@ class AiGenerationController extends Controller
         $log = AiGenerationLog::create(['user_id' => $request->user()->id, 'article_id' => $article->id, 'model' => config('services.gemini.model'), 'status' => 'pending']);
         try {
             // API có thể chờ 90 giây; PHP cần đủ thời gian để xử lý và ghi log.
-            $executionLimit = (int) ini_get('max_execution_time');
-            if ($executionLimit > 0 && $executionLimit < 120) {
-                set_time_limit(120);
+            if (PHP_SAPI !== 'cli') {
+                set_time_limit(max(120, (int) ini_get('max_execution_time')));
             }
             $text = $gemini->generate($article->content);
             $key = config('services.gemini.key');

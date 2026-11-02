@@ -118,4 +118,22 @@ class GeminiTest extends TestCase
         $this->assertStringNotContainsString('fake-test-key', $log->error_message);
         $this->assertSame(0, QuestionSet::count());
     }
+
+    public function test_provider_error_details_are_specific_and_redact_key(): void
+    {
+        $article = Article::create(['title' => 'Biển', 'content' => 'Nội dung']);
+        $sequence = Http::fakeSequence();
+        foreach ([400 => 'INVALID_ARGUMENT', 403 => 'PERMISSION_DENIED', 404 => 'NOT_FOUND', 503 => 'UNAVAILABLE'] as $status => $code) {
+            $sequence->push(['error' => ['status' => $code, 'message' => 'Provider details fake-test-key']], $status);
+        }
+        foreach ([400 => 'INVALID_ARGUMENT', 403 => 'PERMISSION_DENIED', 404 => 'NOT_FOUND', 503 => 'UNAVAILABLE'] as $status => $code) {
+            $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'Quiz lỗi '.$status])->assertSessionHasErrors();
+            $message = AiGenerationLog::latest('id')->firstOrFail()->error_message;
+            $this->assertStringContainsString('HTTP '.$status.' / '.$code, $message);
+            $this->assertStringContainsString('[REDACTED]', $message);
+            $this->assertStringNotContainsString('fake-test-key', $message);
+            if ($status === 503) $this->assertStringContainsString('Dịch vụ Gemini đang bận', $message);
+        }
+        $this->assertSame(0, QuestionSet::count());
+    }
 }
