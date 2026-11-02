@@ -46,6 +46,7 @@ Nếu đã dán key nhưng web vẫn báo chưa cấu hình trong khi CLI nhận
 - Nhật ký ghi thời gian, model, người thao tác, trạng thái, lỗi và phản hồi văn bản đã giới hạn độ dài. Chỉ admin xem được; không ghi API key.
 - Khi API lỗi hoặc không có khóa, vẫn có thể nhập bài và tạo câu thủ công. Không tự xuất bản nội dung AI.
 - Với Gemini 3, quiz sử dụng mức suy luận `low`; thời gian chờ tối đa 90 giây. Cấu hình này giúp tránh chờ quá lâu cho tác vụ 5 câu, nhưng tốc độ thực tế vẫn phụ thuộc API.
+- Thao tác sinh câu hỏi nâng giới hạn thực thi PHP tối thiểu lên 120 giây khi cần, để yêu cầu API 90 giây còn đủ thời gian ghi kết quả hoặc nhật ký lỗi. Trên server phát triển PHP một tiến trình, yêu cầu trang khác có thể phải chờ trong lúc Gemini đang chạy.
 
 Tài liệu kỹ thuật: [MediaWiki Search](https://www.mediawiki.org/wiki/API:Search), [TextExtracts](https://www.mediawiki.org/wiki/Extension:TextExtracts#API), [User-Agent](https://www.mediawiki.org/wiki/Wikimedia_APIs/Access_policy), [Gemini structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output?hl=en).
 

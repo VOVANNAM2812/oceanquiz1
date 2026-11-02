@@ -123,6 +123,7 @@ Mọi đối chiếu đều đạt. Dữ liệu lượt làm chỉ ở database 
 - Đã dừng đúng tiến trình server của dự án, xóa config cache và chạy lại `php artisan serve --host=127.0.0.1 --port=8001` không có `--no-reload`.
 - Kiểm tra qua phiên HTTP đăng nhập admin xác nhận trang `/admin/ai` nhận cấu hình key, không còn cảnh báo trống. Không hiển thị hoặc ghi lại giá trị key.
 - Bổ sung hướng dẫn khởi động lại ngay trong cảnh báo giao diện và README để tránh nhầm lỗi cấu hình với lỗi API.
+- Phát hiện thêm yêu cầu Gemini từ web bị PHP dừng do max_execution_time=60 trong khi HTTP timeout là 90 giây. Controller đã nâng giới hạn PHP lên tối thiểu 120 giây cho riêng thao tác sinh câu hỏi. Một log pending cũ của yêu cầu đã chết được đánh dấu failed; không tác động các yêu cầu còn chạy.
 
 ## Cách chạy lại kiểm thử
 
