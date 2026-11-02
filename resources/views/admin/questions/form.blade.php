@@ -1,0 +1,9 @@
+@extends('layouts.ocean')
+@section('title', $question->exists ? 'Sửa câu hỏi' : 'Thêm câu hỏi')
+@section('content')
+<div class="content-narrow"><div class="page-heading"><div><a class="eyebrow" href="{{ route('admin.question-sets.edit', $set) }}">← {{ $set->title }}</a><h1>{{ $question->exists ? 'Biên tập câu hỏi' : 'Thêm một điều thú vị.' }}</h1></div></div>
+<form class="panel" method="post" action="{{ $question->exists ? route('admin.question-sets.questions.update', [$set, $question]) : route('admin.question-sets.questions.store', $set) }}">@csrf @if($question->exists)@method('patch')@endif
+<div class="form-field"><label for="content" class="field-label">Nội dung câu hỏi *</label><textarea id="content" name="content" required maxlength="2000">{{ old('content', $question->content) }}</textarea></div><p class="help">Nhập đủ bốn lựa chọn và đánh dấu chính xác một đáp án đúng.</p>
+@for($i=0;$i<4;$i++)<div class="form-field"><label class="field-label" for="option_{{ $i }}">Lựa chọn {{ chr(65+$i) }} *</label><input type="text" name="options[]" id="option_{{ $i }}" required maxlength="1000" value="{{ old('options.'.$i, $question->exists ? $question->options->get($i)?->content : '') }}"><label class="help"><input type="radio" name="correct_index" value="{{ $i }}" required @checked((string)old('correct_index', $question->exists ? $question->options->search(fn($o)=>$o->is_correct) : '') === (string)$i)> Đây là đáp án đúng</label></div>@endfor
+<div class="form-field"><label class="field-label" for="explanation">Giải thích sau khi nộp bài</label><textarea id="explanation" name="explanation" maxlength="5000">{{ old('explanation', $question->explanation) }}</textarea></div><div class="actions"><button class="btn">Lưu câu hỏi ↗</button><a class="btn btn-outline" href="{{ route('admin.question-sets.edit', $set) }}">Quay lại</a></div></form></div>
+@endsection
