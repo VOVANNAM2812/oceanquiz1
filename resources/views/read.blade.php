@@ -1,0 +1,7 @@
+@extends('layouts.ocean')
+@section('title', $set->title)
+@section('content')
+<div class="page-heading"><div><a class="eyebrow" href="{{ route('home') }}">← THƯ VIỆN ĐẠI DƯƠNG</a><h1>Một chút kiến thức trước chuyến đi.</h1></div></div>
+<div class="article-layout"><article class="reading-paper"><span class="eyebrow">HỒ SƠ SINH VẬT BIỂN</span><h1>{{ $set->article->title }}</h1>@if($set->article->image_url)<img class="reading-image" src="{{ $set->article->image_url }}" alt="{{ $set->article->title }}">@endif<div class="article-body">{{ $set->article->content }}</div>@if($set->article->source_name || $set->article->source_url)<div class="source">Nguồn: @if($set->article->source_url)<a href="{{ $set->article->source_url }}" target="_blank" rel="noopener noreferrer">{{ $set->article->source_name ?: $set->article->source_url }}</a>@else{{ $set->article->source_name }}@endif @if($set->article->license) · {{ $set->article->license }}@endif</div>@endif</article>
+<aside class="panel reading-aside"><span class="eyebrow">CHUYẾN KHÁM PHÁ CỦA BẠN</span><h2 style="margin-top:12px">{{ $set->title }}</h2><p class="muted">{{ $set->description }}</p><p>◇ 5 câu hỏi trắc nghiệm<br>◷ Không giới hạn thời gian<br>✧ Tối đa 50 điểm</p><div class="inline-note">Đọc theo nhịp của bạn. Khi sẵn sàng, hãy bắt đầu thử sức.</div>@if(Route::has('attempts.start'))<form style="margin-top:20px" method="post" action="{{ route('attempts.start', $set) }}">@csrf<button class="btn" type="submit" style="width:100%">Bắt đầu làm bài ↗</button></form>@endif</aside></div>
+@endsection
