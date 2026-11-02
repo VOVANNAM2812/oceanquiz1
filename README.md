@@ -39,6 +39,8 @@ WIKI_USER_AGENT="OceanQuiz/1.0 (https://github.com/VOVANNAM2812/oceanquiz1)"
 
 Model là cấu hình thay đổi được: chọn model Gemini có quyền truy cập trong tài khoản của bạn và hỗ trợ structured output. Sau khi sửa `.env`, chạy `php artisan config:clear`; nếu cần khởi động lại server local. Khóa được gửi trong header, không đưa vào URL hoặc frontend.
 
+Nếu đã dán key nhưng web vẫn báo chưa cấu hình trong khi CLI nhận được key, hãy kiểm tra cách chạy server. `php artisan serve --no-reload` truyền giá trị môi trường lúc khởi động cho tiến trình web và không nạp lại khi `.env` đổi. Dừng server bằng Ctrl+C rồi chạy lại `php artisan serve --host=127.0.0.1 --port=8001` (không thêm `--no-reload`). Sau đó tải lại trang admin Gemini. Chỉ chạy `config:clear` trong CLI có thể chưa đủ với tiến trình web cũ.
+
 - Wikipedia: vào **Quản trị → Wikipedia**, tìm từ khóa → xem trước → lưu bài. Server gọi API cố định của Wikipedia tiếng Việt, lưu văn bản và liên kết nguồn/giấy phép; bài trùng page ID được cập nhật nếu chưa có lượt làm.
 - Gemini: vào **Gemini & nhật ký**, chọn bài và tên bộ → sinh đúng 5 câu nháp. Chỉ dùng tối đa 12.000 ký tự đầu bài. Server kiểm tra toàn bộ JSON trước khi lưu trong transaction; một câu sai thì không lưu bộ/câu nào.
 - Nhật ký ghi thời gian, model, người thao tác, trạng thái, lỗi và phản hồi văn bản đã giới hạn độ dài. Chỉ admin xem được; không ghi API key.
