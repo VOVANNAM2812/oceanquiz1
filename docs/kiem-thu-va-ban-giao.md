@@ -14,7 +14,7 @@
 | C | CRUD bộ/câu/4 lựa chọn, kiểm tra xuất bản, khóa nội dung đã dùng | Hoàn thành |
 | C | 3 bộ published + 1 bộ draft, seeder chạy lại không ghi đè | Hoàn thành |
 | C | Xếp hạng điểm cao nhất → thời điểm đạt điểm sớm nhất | Hoàn thành |
-| C | Gemini sinh nháp, validate, transaction, nhật ký, dự phòng thủ công | Hoàn thành mã nguồn và kiểm thử giả lập; chờ API key để gọi thật |
+| C | Gemini sinh nháp, validate, transaction, nhật ký, dự phòng thủ công | Hoàn thành; đã gọi thật thành công và kiểm thử lỗi giả lập |
 
 Mỗi nhóm chức năng có commit tiền tố A/B/C và được push trực tiếp lên main theo yêu cầu. Tác giả Git là tài khoản đang cấu hình, không tạo ba danh tính tác giả giả.
 
@@ -81,6 +81,17 @@ Thí nghiệm kiểm tra khóa và transaction ở lớp controller/database; kh
 - Đã kiểm tra JSON hỏng, phản hồi bị cắt, thiếu key, HTTP 429, và bài nguồn thay đổi lúc chờ API.
 - Không đưa key vào URL hoặc log lỗi. Không tự xuất bản dữ liệu AI.
 
+### Bổ sung kiểm chứng Gemini thật ngày 03/11/2026
+
+- Kiểm tra danh sách model bằng khóa cấu hình trong `.env`: HTTP 200, model `gemini-3.8-flash` có sẵn.
+- Các lần đầu đã gặp hết thời gian chờ; ứng dụng ghi log failed và không lưu câu hỏi một phần.
+- Điều chỉnh tác vụ quiz dùng thinkingLevel low cho Gemini 3 và timeout 90 giây; Gemini 2.5 không bị gửi tham số thinkingLevel không tương thích. Tham khảo [hướng dẫn thinking của Google](https://ai.google.dev/gemini-api/docs/generate-content/thinking.md).
+- Sau khi người dùng cập nhật key, gọi `gemini-3.8-flash` thành công trong 55,11 giây: HTTP 200, finishReason STOP, nhật ký local ID 4 ở trạng thái success.
+- Bộ local ID 6: “Gemini kiểm tra key mới — Cá voi xanh”, source ai, status draft, 5 câu, 20 lựa chọn, mỗi câu đúng 1 đáp án và có giải thích. `isReady()` trả true. Chưa xuất bản.
+- Trước đó, `gemini-3.5-flash-lite` cũng đã tạo thành công bộ local ID 5 trong 25,82 giây; giữ nguyên bộ này để đối chiếu.
+- ID và bộ thử chỉ tồn tại trong database local, không phải dữ liệu mặc định khi clone repo. Không lưu key hoặc dấu nhận dạng key trong báo cáo.
+- Kiểm thử sau điều chỉnh: 51 tests passed, 209 assertions trên MariaDB. Có thêm kiểm thử cấu hình theo họ model và lỗi kết nối không làm lộ key.
+
 ## Cách chạy lại kiểm thử
 
 Tạo riêng database `oceanquiz1_test`, kiểm tra cấu hình test trước khi chạy:
@@ -109,7 +120,7 @@ Kết quả kiểm thử cuối được ghi trong phần cập nhật bàn giao
 
 ## Giới hạn cần biết
 
-- Chưa có khóa Gemini ở môi trường local nên chưa khẳng định gọi thật Gemini thành công; test Http::fake chỉ xác nhận logic ứng dụng và hợp đồng request/response.
+- Đã xác nhận gọi thật Gemini thành công trên môi trường local. Các lần kiểm chứng không bảo đảm API luôn có cùng tốc độ hoặc hạn mức ở tài khoản khác; test Http::fake chỉ xác nhận logic ứng dụng và hợp đồng request/response.
 - Chưa triển khai hosting công khai. Push GitHub là lưu mã nguồn, không tự deploy website.
 - Không đồng bộ database/.env qua GitHub. Máy khác phải cài dependency, tạo database, migrate và seed.
 - Mail reset mật khẩu mặc định ghi log; chưa có SMTP thật.

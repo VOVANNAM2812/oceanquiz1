@@ -89,4 +89,33 @@ class GeminiTest extends TestCase
         $this->assertSame(0, QuestionSet::count());
         $this->assertDatabaseHas('ai_generation_logs', ['status' => 'failed']);
     }
+
+    public function test_thinking_configuration_is_compatible_with_each_model_family(): void
+    {
+        $article = Article::create(['title' => 'Biển', 'content' => 'Nội dung']);
+        Http::fake(function ($request) {
+            $level = $request['generationConfig']['thinkingConfig']['thinkingLevel'] ?? null;
+            $isGeminiThree = str_contains($request->url(), '/gemini-3.8-flash:');
+            if (($isGeminiThree && $level !== 'low') || (!$isGeminiThree && $level !== null)) {
+                return Http::response(['error' => ['message' => 'Unsupported thinking configuration']], 400);
+            }
+            return Http::response(['candidates' => [['finishReason' => 'STOP', 'content' => ['parts' => [['text' => json_encode($this->data())]]]]]]);
+        });
+        foreach (['gemini-3.8-flash', 'gemini-2.5-flash'] as $model) {
+            config(['services.gemini.model' => $model]);
+            $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'Quiz '.$model])->assertSessionHasNoErrors();
+        }
+        $this->assertSame(2, AiGenerationLog::where('status', 'success')->count());
+    }
+
+    public function test_transport_failure_never_exposes_key_in_log_or_error(): void
+    {
+        $article = Article::create(['title' => 'Biển', 'content' => 'Nội dung']);
+        Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('Transport details fake-test-key'));
+        $this->post('/admin/ai', ['article_id' => $article->id, 'title' => 'Quiz lỗi mạng'])->assertSessionHasErrors();
+        $log = AiGenerationLog::firstOrFail();
+        $this->assertSame('failed', $log->status);
+        $this->assertStringNotContainsString('fake-test-key', $log->error_message);
+        $this->assertSame(0, QuestionSet::count());
+    }
 }

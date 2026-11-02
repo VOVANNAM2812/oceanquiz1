@@ -43,6 +43,7 @@ Model là cấu hình thay đổi được: chọn model Gemini có quyền truy
 - Gemini: vào **Gemini & nhật ký**, chọn bài và tên bộ → sinh đúng 5 câu nháp. Chỉ dùng tối đa 12.000 ký tự đầu bài. Server kiểm tra toàn bộ JSON trước khi lưu trong transaction; một câu sai thì không lưu bộ/câu nào.
 - Nhật ký ghi thời gian, model, người thao tác, trạng thái, lỗi và phản hồi văn bản đã giới hạn độ dài. Chỉ admin xem được; không ghi API key.
 - Khi API lỗi hoặc không có khóa, vẫn có thể nhập bài và tạo câu thủ công. Không tự xuất bản nội dung AI.
+- Với Gemini 3, quiz sử dụng mức suy luận `low`; thời gian chờ tối đa 90 giây. Cấu hình này giúp tránh chờ quá lâu cho tác vụ 5 câu, nhưng tốc độ thực tế vẫn phụ thuộc API.
 
 Tài liệu kỹ thuật: [MediaWiki Search](https://www.mediawiki.org/wiki/API:Search), [TextExtracts](https://www.mediawiki.org/wiki/Extension:TextExtracts#API), [User-Agent](https://www.mediawiki.org/wiki/Wikimedia_APIs/Access_policy), [Gemini structured output](https://ai.google.dev/gemini-api/docs/generate-content/structured-output?hl=en).
 
@@ -116,10 +117,10 @@ Chi tiết nghiệm thu, giới hạn kiểm chứng và kịch bản demo nằm
 
 ## Kết quả kiểm tra bản bàn giao
 
-- `php artisan test --compact`: **49 tests passed, 202 assertions** trên MariaDB.
+- `php artisan test --compact`: **51 tests passed, 209 assertions** trên MariaDB.
 - `npm run build`, `php artisan view:cache` và `composer validate --strict`: thành công.
 - Đã kiểm tra trình duyệt luồng user (50/50, lịch sử, xếp hạng), admin, Wikipedia thật và responsive 1280/375 px.
 - Đã thử start/submit đồng thời bằng hai tiến trình trên database riêng: 1 lượt, 5 câu trả lời, 50 điểm.
-- Gemini đã kiểm thử bằng HTTP giả lập; cần API key hợp lệ để xác minh gọi thật. Đây là giới hạn kiểm chứng, không có bộ câu hỏi giả được gắn nhãn là sinh từ API thật.
+- Ngày 03/11/2026 đã gọi thật Gemini thành công với `gemini-3.8-flash`: HTTP 200, finishReason STOP, khoảng 55 giây; bộ nháp có 5 câu, 20 lựa chọn, mỗi câu 1 đáp án đúng và có giải thích. Bản thử local tên “Gemini kiểm tra key mới — Cá voi xanh”, không tự xuất bản. Các kiểm thử lỗi vẫn dùng HTTP giả lập.
 
 Xem [phân chia công việc.md](phân%20chia%20công%20việc.md) để biết kế hoạch chi tiết.
