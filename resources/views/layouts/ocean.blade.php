@@ -34,7 +34,7 @@
 <div class="{{ auth()->check() ? 'workspace' : 'guest-workspace' }}">
     <header class="topbar">
         @guest<a class="brand" href="{{ route('landing') }}"><span class="brand-icon">≈</span> OceanQuiz<span class="brand-dot">.</span></a>@else<span class="topbar-caption">MỘT CHÚT TÒ MÒ. MỘT ĐẠI DƯƠNG KIẾN THỨC.</span>@endguest
-        <div class="topbar-right"><span class="live-dot"></span><span>Học điều mới mỗi ngày</span>@guest<a href="{{ route('login') }}" class="btn btn-small btn-outline">Đăng nhập ↗</a>@endguest</div>
+        <div class="topbar-right"><span class="live-dot"></span><span>Học điều mới mỗi ngày</span>@guest<a href="{{ route('login') }}" class="btn btn-small btn-outline">Đăng nhập ↗</a>@else<form class="mobile-logout" method="post" action="{{ route('logout') }}">@csrf<button class="btn btn-small btn-outline">Đăng xuất ↗</button></form>@endguest</div>
     </header>
     <main id="main-content" class="main-content">
         @if(session('success'))<div class="notice success" role="status">{{ session('success') }}</div>@endif

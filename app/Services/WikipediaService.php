@@ -42,7 +42,7 @@ class WikipediaService
         return [
             'wiki_page_id' => $pageId, 'title' => mb_substr($page['title'], 0, 200),
             'content' => mb_substr($page['extract'], 0, 100000),
-            'source_name' => 'Wikipedia tiếng Việt · '.$page['title'],
+            'source_name' => mb_substr('Wikipedia tiếng Việt · '.$page['title'], 0, 255),
             'source_url' => 'https://vi.wikipedia.org/?curid='.$pageId,
             'license' => 'CC BY-SA · xem giấy phép và lịch sử tác giả tại bài nguồn',
         ];
