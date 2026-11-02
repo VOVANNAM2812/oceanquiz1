@@ -2,7 +2,7 @@
 
 ## 1. Điểm xuất phát và mục tiêu
 
-> Cập nhật phạm vi đã chốt ngày 02/11/2026: triển khai Wikipedia và Gemini ngay trong phiên bản đầu. Làm lần lượt vai A/B/C, commit theo `A- ...`, `B- ...`, `C- ...` và push từng chức năng trực tiếp lên `main`. Hai API chỉ phục vụ admin: Wikipedia tìm/xem/lưu bài; Gemini sinh 5 câu nháp, validate toàn bộ và ghi nhật ký. Khi API lỗi vẫn nhập thủ công được. Những đoạn ghi hai API ngoài phạm vi bên dưới là kế hoạch ban đầu và được thay thế bởi quyết định này.
+> Cập nhật phạm vi đã chốt ngày 02/11/2026: triển khai Wikipedia và Gemini ngay trong phiên bản đầu. Làm lần lượt vai A/B/C, commit theo `A- ...`, `B- ...`, `C- ...` và push từng chức năng trực tiếp lên `main`. Hai API chỉ phục vụ admin: Wikipedia tìm/xem/lưu bài; Gemini sinh 5 câu nháp, validate toàn bộ và ghi nhật ký. Khi API lỗi vẫn nhập thủ công được. Xem README và `docs/kiem-thu-va-ban-giao.md` để biết trạng thái triển khai thực tế.
 
 - Dự án bắt đầu từ con số 0: chỉ có ý tưởng và đặc tả, chưa có mã nguồn Laravel, database, giao diện hoặc dữ liệu mẫu.
 - Thư mục triển khai: `C:\xampp\htdocs\oceanquiz1`.
@@ -25,7 +25,7 @@
 
 ### 1.2. Ngoài phạm vi
 
-Chưa làm Wikipedia API, Gemini API, highlight, đếm ngược, điểm theo tốc độ, hiệu ứng parallax, thi đấu nhiều người, bảng xếp hạng tổng, nhập JSON, upload ảnh hoặc giao diện đổi vai trò tài khoản. Ảnh dùng đường dẫn URL hợp lệ. Nếu giảng viên bắt buộc hai API, cả nhóm phải lập thêm giai đoạn riêng và điều chỉnh khối lượng trước khi thực hiện.
+Chưa làm highlight, đếm ngược, điểm theo tốc độ, hiệu ứng parallax, thi đấu nhiều người, bảng xếp hạng tổng, nhập JSON, upload ảnh hoặc giao diện đổi vai trò tài khoản. Ảnh dùng đường dẫn URL hợp lệ. Wikipedia và Gemini thuộc phạm vi phiên bản đầu theo quyết định đã cập nhật.
 
 ## 2. Phân công tổng thể
 
@@ -118,6 +118,8 @@ Mỗi người tự làm cả backend, Blade và kiểm thử cho phần mình. 
 **Kiểm thử A phụ trách:** khách/user/admin, đăng ký không nâng quyền, CRUD bài viết, bộ nháp, tìm kiếm và truy cập trang đọc.
 
 ## 4. Công việc chi tiết của B
+
+**Bổ sung phần A đã chốt:** A08 triển khai `WikipediaService`, trang admin tìm/xem/lưu bài, unique page ID, thông tin nguồn/giấy phép và kiểm thử API lỗi. API được gọi ở server, không nhận URL bất kỳ từ client.
 
 ### B01. Thiết kế và tạo model lượt làm
 
@@ -273,6 +275,8 @@ Mỗi người tự làm cả backend, Blade và kiểm thử cho phần mình. 
 **Bàn giao C:** model nội dung, CRUD, route, Blade, seeder, xếp hạng, test và hướng dẫn.
 
 ## 6. Hợp đồng database chung
+
+**Bổ sung phần C đã chốt:** C09 triển khai `GeminiService`, sinh đúng 5 câu dạng JSON, validate toàn bộ, lưu transaction ở trạng thái draft, nhật ký pending/success/failed, timeout và form thủ công dự phòng. Tạo bảng `ai_generation_logs`; bổ sung metadata Wikipedia cho articles và nguồn manual/ai cho question_sets. Không commit khóa API.
 
 Đây là thiết kế khởi tạo mới, không lấy cấu trúc từ dự án OceanQuiz cũ. A viết migration sau khi B/C xác nhận; mỗi người sở hữu model theo phân công.
 
