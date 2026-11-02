@@ -2,6 +2,14 @@
 
 return [
 
+    'wikipedia' => [
+        'user_agent' => env('WIKI_USER_AGENT', 'OceanQuiz/1.0 (https://github.com/VOVANNAM2812/oceanquiz1)'),
+    ],
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
